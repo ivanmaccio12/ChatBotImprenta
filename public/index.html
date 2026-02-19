@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CopyShow Salta | Asistente Virtual</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="chat-container">
+        <header class="chat-header">
+            <div class="logo-container">
+                <div class="logo-circle">CS</div>
+            </div>
+            <div class="header-info">
+                <h1>CopyShow Salta</h1>
+                <p>Asistente Virtual IA</p>
+            </div>
+        </header>
+
+        <div class="messages-area" id="messagesArea">
+            <div class="message bot-message welcome">
+                <div class="message-content">
+                    ¡Hola! 👋 Soy el asistente virtual de CopyShow Salta. Estoy aquí para ayudarte con soluciones de impresión y comunicación visual. ¿En qué puedo asesorarte hoy?
+                </div>
+                <div class="message-time">Ahora</div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <form id="chatForm" class="chat-form">
+                <input type="text" id="messageInput" placeholder="Escribe tu consulta aquí..." autocomplete="off">
+                <button type="submit" id="sendButton">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
