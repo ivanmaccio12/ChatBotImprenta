@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { systemPrompt } from '../config/systemPrompt.js';
+import { getSystemPrompt } from '../config/systemPrompt.js';
+import { getSheetData, formatDataForPrompt } from '../services/googleSheetService.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -16,14 +17,23 @@ export const chatController = async (req, res) => {
             return res.status(400).json({ error: 'Message is required' });
         }
 
+        // Fetch dynamic data from Google Sheets
+        let dynamicPrompt = "";
+        try {
+            const sheetData = await getSheetData();
+            dynamicPrompt = formatDataForPrompt(sheetData);
+        } catch (error) {
+            console.error('Error fetching dynamic data for prompt:', error);
+            // Non-blocking error, proceed with static prompt
+        }
+
         // Format history for Anthropic API if provided
-        // Expected format: [{ role: 'user' | 'assistant', content: string }]
         const messages = history ? [...history, { role: 'user', content: message }] : [{ role: 'user', content: message }];
 
         const response = await anthropic.messages.create({
             model: "claude-sonnet-4-5-20250929",
             max_tokens: 1024,
-            system: systemPrompt,
+            system: getSystemPrompt(dynamicPrompt),
             messages: messages,
         });
 
