@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { getSystemPrompt } from '../config/systemPrompt.js';
 import { getSheetData, formatDataForPrompt } from '../services/googleSheetService.js';
+import { getHistory, saveHistory } from '../services/conversationService.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -11,10 +12,13 @@ const anthropic = new Anthropic({
 
 export const chatController = async (req, res) => {
     try {
-        const { message, history } = req.body;
+        const { message, session_id } = req.body;
 
         if (!message) {
             return res.status(400).json({ error: 'Message is required' });
+        }
+        if (!session_id) {
+            return res.status(400).json({ error: 'session_id is required (use the customer phone number)' });
         }
 
         // Fetch dynamic data from Google Sheets
@@ -27,8 +31,11 @@ export const chatController = async (req, res) => {
             // Non-blocking error, proceed with static prompt
         }
 
-        // Format history for Anthropic API if provided
-        const messages = history ? [...history, { role: 'user', content: message }] : [{ role: 'user', content: message }];
+        // Load conversation history from PostgreSQL (expires after 24h automatically)
+        const history = await getHistory(session_id);
+
+        // Build messages array: existing history + new user message
+        const messages = [...history, { role: 'user', content: message }];
 
         const response = await anthropic.messages.create({
             model: "claude-sonnet-4-5-20250929",
@@ -38,6 +45,13 @@ export const chatController = async (req, res) => {
         });
 
         const reply = response.content[0].text;
+
+        // Append the assistant reply to the history and save back to DB
+        const updatedHistory = [
+            ...messages,
+            { role: 'assistant', content: reply }
+        ];
+        await saveHistory(session_id, updatedHistory);
 
         res.json({ reply });
     } catch (error) {

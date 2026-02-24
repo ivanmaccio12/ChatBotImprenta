@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { chatController } from './controllers/chatController.js';
+import { initDB, pool } from './services/dbService.js';
 
 dotenv.config();
 
@@ -18,6 +19,18 @@ app.get('/health', (req, res) => {
 
 app.post('/chat', chatController);
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server v1.1.0 is running on port ${PORT}`);
+initDB()
+    .then(() => {
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`Server v1.2.0 is running on port ${PORT}`);
+        });
+    })
+    .catch((err) => {
+        console.error('Failed to initialize DB, server not started:', err.message);
+        process.exit(1);
+    });
+
+process.on('SIGTERM', async () => {
+    await pool.end();
+    process.exit(0);
 });
