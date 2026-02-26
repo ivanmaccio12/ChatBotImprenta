@@ -44,8 +44,29 @@ export const chatController = async (req, res) => {
             messages: messages,
         });
 
-        const reply = response.content[0].text;
+        const replyText = response.content[0].text;
+        let reply = replyText;
+        let saleClosed = false;
+        let saleDetails = null;
 
+        // Extraer bloque JSON si la venta está cerrada
+        const jsonMatch = replyText.match(/```json\n?([\s\S]*?)\n?```/);
+        if (jsonMatch) {
+            try {
+                const parsedData = JSON.parse(jsonMatch[1]);
+                if (parsedData.SALE_CLOSED) {
+                    saleClosed = true;
+                    saleDetails = {
+                        items: parsedData.items,
+                        total_price: parsedData.total_price
+                    };
+                    // Remover el bloque JSON de la respuesta que ve el cliente
+                    reply = replyText.replace(/```json\n?[\s\S]*?\n?```/, '').trim();
+                }
+            } catch (e) {
+                console.error('Error parsing JSON from Claude:', e);
+            }
+        }
         // Append the assistant reply to the history and save back to DB
         const updatedHistory = [
             ...messages,
@@ -53,7 +74,7 @@ export const chatController = async (req, res) => {
         ];
         await saveHistory(session_id, updatedHistory);
 
-        res.json({ reply });
+        res.json({ reply, saleClosed, saleDetails });
     } catch (error) {
         console.error('Error interacting with Claude:', error);
         res.status(500).json({ error: 'Internal Server Error', details: error.message });
