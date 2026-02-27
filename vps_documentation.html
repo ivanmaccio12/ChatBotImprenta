@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación VPS - Hostinger</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+        .a4-container {
+            width: 21cm;
+            min-height: 29.7cm;
+            padding: 2cm;
+            margin: 1cm auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+            font-size: 24px;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 20px;
+            font-size: 18px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 3px;
+        }
+        p {
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .highlight {
+            background-color: #e8f4f8;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #c0392b;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 12px;
+            text-align: center;
+            color: #7f8c8d;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="a4-container">
+    <h1>Documentación de Servicios VPS (Hostinger)</h1>
+    <p>Esta es una referencia técnica de todos los servicios activos en tu VPS con IP <span class="highlight">31.97.31.53</span>. Utiliza esta guía para evitar conflictos de red o puertos cuando agregues nuevos bots o servicios.</p>
+
+    <h2>1. Aplicaciones Node.js (Administradas con PM2)</h2>
+    <p>Estos procesos se ejecutan directamente en la máquina virtual y son orquestados por MP2. Aquí residen tus bots y APIs locales principales.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Proceso</th>
+                <th>Directorio Raíz</th>
+                <th>Puerto</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>ChatBotImprenta</strong></td>
+                <td><span class="highlight">/var/www/ChatBotImprenta</span></td>
+                <td><span class="highlight">3002</span></td>
+                <td>Online</td>
+            </tr>
+            <tr>
+                <td><strong>api-node</strong></td>
+                <td><span class="highlight">/var/www/api-node</span></td>
+                <td><span class="highlight">3001</span></td>
+                <td>Online</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><em>💡 Nota: Si agregas un nuevo bot de Node.js, configuralo para ejecutarse en el puerto <span class="highlight">3003</span> o superior (que esté libre en esta lista) y créalo en una carpeta separada bajo <span class="highlight">/var/www/</span>.</em></p>
+
+    <h2>2. Contenedores Docker Activos</h2>
+    <p>Aquí se ejecutan n8n, la base de datos PostgreSQL, la API de Evolution y el Proxy reverso.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Contenedor</th>
+                <th>Mapeo de Puertos (Host -> Contenedor)</th>
+                <th>Descripción / Rol</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>root-traefik-1</strong></td>
+                <td>80->80 | 443->443 (Expuesto)</td>
+                <td>Proxy Inverso para manejar dominios web y SSL de n8n.</td>
+            </tr>
+            <tr>
+                <td><strong>root-n8n-1</strong></td>
+                <td>127.0.0.1:5678 -> 5678</td>
+                <td>Motor de automatización n8n. (Accedido mediante Traefik).</td>
+            </tr>
+            <tr>
+                <td><strong>evolution_api</strong></td>
+                <td>8080 -> 8080 (Expuesto)</td>
+                <td>API para conectar WhatsApp.</td>
+            </tr>
+            <tr>
+                <td><strong>evolution_postgres</strong></td>
+                <td>127.0.0.1:5432 -> 5432</td>
+                <td>Base de datos PostgreSQL. Accesible solo desde el VPS o Docker.</td>
+            </tr>
+            <tr>
+                <td><strong>evolution_redis</strong></td>
+                <td>127.0.0.1:6379 -> 6379</td>
+                <td>Base de datos Redis para cache de Evolution API.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3. Resumen de Puertos en Uso</h2>
+    <p>No utilices estos puertos para nuevos proyectos:</p>
+    <ul>
+        <li><strong>22:</strong> SSH (Administración del servidor)</li>
+        <li><strong>80, 443:</strong> HTTP/HTTPS (Servidor Proxy Traefik)</li>
+        <li><strong>3001:</strong> API api-node (PM2)</li>
+        <li><strong>3002:</strong> ChatBotImprenta (PM2)</li>
+        <li><strong>5432:</strong> PostgreSQL (Docker)</li>
+        <li><strong>5678:</strong> n8n interno (Docker)</li>
+        <li><strong>6379:</strong> Redis (Docker)</li>
+        <li><strong>8080:</strong> Evolution API (Docker)</li>
+    </ul>
+
+    <h2>4. Recomendaciones para Nuevos Bots</h2>
+    <ul>
+        <li><strong>Ubicación:</strong> Clona o crea el código del nuevo bot en la ruta <span class="highlight">/var/www/NombreDelBot</span>.</li>
+        <li><strong>Asignación de Puertos:</strong> Usa <span class="highlight">3003</span>, <span class="highlight">3004</span>, etc., si es una app local bajo PM2.</li>
+        <li><strong>Base de Datos:</strong> Puedes crear esquemas separados dentro del Postgresql existente en el puerto <span class="highlight">5432</span> usando el usuario y clave actuales, o bien conectarte mediante la IP local de docker o <span class="highlight">127.0.0.1</span>.</li>
+    </ul>
+
+    <div class="footer">
+        Documentación generada automáticamente — Creado el <?php echo date("Y-m-d"); ?>
+    </div>
+</div>
+
+</body>
+</html>
