@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { chatController } from './controllers/chatController.js';
 import { initDB, pool } from './services/dbService.js';
-
+import { createOrder, getOrders, updateOrderStatus } from './controllers/ordersController.js';
 dotenv.config();
 
 const app = express();
@@ -19,6 +19,10 @@ app.get('/health', (req, res) => {
 
 app.post('/chat', chatController);
 
+// Orders Endpoints
+app.post('/orders', createOrder);
+app.get('/orders', getOrders);
+app.put('/orders/:id/status', updateOrderStatus);
 initDB()
     .then(() => {
         app.listen(PORT, '0.0.0.0', () => {
