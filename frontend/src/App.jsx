@@ -92,6 +92,7 @@ function App() {
                                         <div className="card-details">
                                             <div><strong>Ref MP:</strong> {order.mp_reference}</div>
                                             <div><strong>Teléfono:</strong> {order.customer_phone}</div>
+                                            <div><strong>Fecha:</strong> {new Date(order.created_at).toLocaleString('es-AR')}</div>
                                             {order.details && Array.isArray(order.details) && order.details.map((item, i) => (
                                                 <div key={i} style={{ marginTop: '4px' }}>
                                                     • {item.title || item.name} ({item.quantity}x)

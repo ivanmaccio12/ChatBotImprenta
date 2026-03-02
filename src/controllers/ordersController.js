@@ -26,7 +26,7 @@ export const createOrder = async (req, res) => {
 
 export const getOrders = async (req, res) => {
     try {
-        const query = `SELECT * FROM orders ORDER BY created_at DESC;`;
+        const query = `SELECT * FROM orders ORDER BY created_at ASC;`;
         const result = await pool.query(query);
         res.status(200).json({ success: true, data: result.rows });
     } catch (error) {
