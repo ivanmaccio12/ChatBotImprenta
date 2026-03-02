@@ -13,6 +13,7 @@ const COLUMNS = [
 function App() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showAllDelivered, setShowAllDelivered] = useState(false);
 
     const fetchOrders = async () => {
         try {
@@ -76,13 +77,17 @@ function App() {
 
             <div className="board">
                 {COLUMNS.map(col => {
-                    const columnOrders = orders.filter(o => (o.status || 'nuevos_pedidos') === col.id);
+                    const allColumnOrders = orders.filter(o => (o.status || 'nuevos_pedidos') === col.id);
+                    const isEntregados = col.id === 'entregados';
+                    const columnOrders = (isEntregados && !showAllDelivered)
+                        ? allColumnOrders.slice(0, 10)
+                        : allColumnOrders;
 
                     return (
                         <div key={col.id} className={`column col-${col.id}`}>
                             <div className="column-header">
                                 <span className="column-title">{col.title}</span>
-                                <span className="column-count">{columnOrders.length}</span>
+                                <span className="column-count">{allColumnOrders.length}</span>
                             </div>
 
                             <div className="column-content">
@@ -128,9 +133,21 @@ function App() {
                                     </div>
                                 ))}
 
-                                {columnOrders.length === 0 && (
+                                {allColumnOrders.length === 0 && (
                                     <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem 0', fontSize: '0.9rem', fontStyle: 'italic' }}>
                                         Sin pedidos
+                                    </div>
+                                )}
+
+                                {isEntregados && allColumnOrders.length > 10 && (
+                                    <div style={{ textAlign: 'center', paddingTop: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)', marginTop: '0.5rem' }}>
+                                        <button
+                                            className="btn-move"
+                                            style={{ width: '100%', padding: '0.75rem', background: 'rgba(255, 255, 255, 0.05)' }}
+                                            onClick={() => setShowAllDelivered(!showAllDelivered)}
+                                        >
+                                            {showAllDelivered ? 'Ocultar históricos' : `Ver todos (${allColumnOrders.length})`}
+                                        </button>
                                     </div>
                                 )}
                             </div>
