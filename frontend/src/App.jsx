@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './index.css';
 
-const API_URL = 'http://localhost:3002'; // Update this for production
+const API_URL = `http://${window.location.hostname}:3002`; // Use dynamic IP or domain
 
 const COLUMNS = [
     { id: 'nuevos_pedidos', title: 'Nuevos Pedidos' },
