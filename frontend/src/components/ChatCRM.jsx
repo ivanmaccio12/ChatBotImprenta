@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import './index.css';
+import '../index.css';
 
 const API_URL = `http://${window.location.hostname}:3002`;
 
