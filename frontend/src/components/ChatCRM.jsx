@@ -218,18 +218,16 @@ export default function ChatCRM() {
                                 <form onSubmit={sendMessage} className="crm-input-form">
                                     <input
                                         type="text"
-                                        placeholder="Escribe un mensaje..."
+                                        placeholder={sessionData.status === 'paused' ? "Escribe un mensaje..." : "Para escribir un mensaje, pausa el bot primero..."}
                                         value={messageInput}
                                         onChange={(e) => setMessageInput(e.target.value)}
                                         className="crm-input"
+                                        disabled={sessionData.status !== 'paused'}
                                     />
-                                    <button type="submit" className="crm-btn-send" disabled={!messageInput.trim()}>
+                                    <button type="submit" className="crm-btn-send" disabled={sessionData.status !== 'paused' || !messageInput.trim()}>
                                         Enviar
                                     </button>
                                 </form>
-                                {sessionData.status !== 'paused' && (
-                                    <div className="crm-input-hint">⚠️ Enviar un mensaje pausará el bot automáticamente.</div>
-                                )}
                             </div>
                         </>
                     ) : (
