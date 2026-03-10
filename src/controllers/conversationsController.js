@@ -10,6 +10,7 @@ export const getConversationsList = async (req, res) => {
         const result = await pool.query(
             `SELECT session_id, status, unread_count, needs_intervention, updated_at 
              FROM conversations 
+             WHERE updated_at >= NOW() - INTERVAL '24 HOURS'
              ORDER BY updated_at DESC`
         );
         res.json({ success: true, data: result.rows });
