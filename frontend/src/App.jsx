@@ -12,7 +12,7 @@ const COLUMNS = [
 ];
 
 function App() {
-    const [view, setView] = useState('kanban'); // 'kanban' or 'crm'
+    const [view, setView] = useState('crm'); // 'kanban' or 'crm'
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAllDelivered, setShowAllDelivered] = useState(false);

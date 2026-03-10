@@ -13,8 +13,14 @@ async function deploy() {
         console.log('Connected!');
 
         console.log('Executing deployment commands on VPS...');
-        // The main bot is in /var/www/ChatBotImprenta
-        const result = await ssh.execCommand('git pull origin main && npm install && pm2 restart ChatBotImprenta', { cwd: '/var/www/ChatBotImprenta' });
+        // Drop local changes inside the VPS before pulling to avoid merge conflicts
+        const commands = `
+          git fetch origin main &&
+          git reset --hard origin/main &&
+          npm install &&
+          pm2 restart ChatBotImprenta
+        `;
+        const result = await ssh.execCommand(commands, { cwd: '/var/www/ChatBotImprenta' });
         console.log('STDOUT:', result.stdout);
         if (result.stderr) console.error('STDERR:', result.stderr);
 
