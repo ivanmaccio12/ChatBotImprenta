@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { getSystemPrompt } from '../config/systemPrompt.js';
 import { getSheetData, formatDataForPrompt } from '../services/googleSheetService.js';
-import { getHistory, saveHistory } from '../services/conversationService.js';
+import { getSession, saveSession } from '../services/conversationService.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -31,11 +31,22 @@ export const chatController = async (req, res) => {
             // Non-blocking error, proceed with static prompt
         }
 
-        // Load conversation history from PostgreSQL (expires after 24h automatically)
-        const history = await getHistory(session_id);
+        // Load conversation session from PostgreSQL
+        const session = await getSession(session_id);
+        const history = session ? session.history : [];
+        const status = session ? session.status : 'active';
+        let unreadCount = session ? session.unread_count : 0;
+        let needsIntervention = session ? session.needs_intervention : false;
 
         // Build messages array: existing history + new user message
         const messages = [...history, { role: 'user', content: message }];
+
+        // If the bot is paused, we just save the user message, increment unread, and return null
+        if (status === 'paused') {
+            unreadCount += 1;
+            await saveSession(session_id, messages, unreadCount, needsIntervention);
+            return res.json({ reply: null, saleClosed: false, saleDetails: null });
+        }
 
         const response = await anthropic.messages.create({
             model: "claude-sonnet-4-5-20250929",
@@ -49,7 +60,7 @@ export const chatController = async (req, res) => {
         let saleClosed = false;
         let saleDetails = null;
 
-        // Extraer bloque JSON si la venta está cerrada
+        // Extraer bloque JSON si la venta está cerrada o se necesita intervención
         const jsonMatch = replyText.match(/```json\n?([\s\S]*?)\n?```/);
         if (jsonMatch) {
             try {
@@ -60,19 +71,24 @@ export const chatController = async (req, res) => {
                         items: parsedData.items,
                         total_price: parsedData.total_price
                     };
-                    // Remover el bloque JSON de la respuesta que ve el cliente
-                    reply = replyText.replace(/```json\n?[\s\S]*?\n?```/, '').trim();
                 }
+                if (parsedData.NEEDS_INTERVENTION) {
+                    needsIntervention = true;
+                }
+                // Remover el bloque JSON de la respuesta que ve el cliente
+                reply = replyText.replace(/```json\n?[\s\S]*?\n?```/, '').trim();
             } catch (e) {
                 console.error('Error parsing JSON from Claude:', e);
             }
         }
+
         // Append the assistant reply to the history and save back to DB
         const updatedHistory = [
             ...messages,
             { role: 'assistant', content: reply }
         ];
-        await saveHistory(session_id, updatedHistory);
+
+        await saveSession(session_id, updatedHistory, unreadCount, needsIntervention);
 
         res.json({ reply, saleClosed, saleDetails });
     } catch (error) {

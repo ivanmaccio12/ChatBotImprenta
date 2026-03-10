@@ -72,4 +72,10 @@ ${dynamicData}
     }
     \`\`\`
     * Este bloque JSON NO se le mostrará al cliente, lo usamos internamente para generar su link de pago. No lo incluyas a menos que la venta esté cerrada.
+*   **Intervención Humana:** Si el cliente explícitamente pide hablar con un humano, se queja, o hace una pregunta que no puedes resolver, DEBES incluir este JSON al final de tu respuesta (puedes combinarlo con el de arriba si aplica):
+    \`\`\`json
+    {
+      "NEEDS_INTERVENTION": true
+    }
+    \`\`\`
 `;

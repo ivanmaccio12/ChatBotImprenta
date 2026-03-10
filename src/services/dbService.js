@@ -16,8 +16,16 @@ export const initDB = async () => {
             CREATE TABLE IF NOT EXISTS conversations (
                 session_id   TEXT PRIMARY KEY,
                 history      JSONB NOT NULL DEFAULT '[]',
+                status       VARCHAR(50) DEFAULT 'active',
+                unread_count INT DEFAULT 0,
+                needs_intervention BOOLEAN DEFAULT false,
                 updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
+
+            -- Add columns to conversations if they don't exist
+            ALTER TABLE conversations ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+            ALTER TABLE conversations ADD COLUMN IF NOT EXISTS unread_count INT DEFAULT 0;
+            ALTER TABLE conversations ADD COLUMN IF NOT EXISTS needs_intervention BOOLEAN DEFAULT false;
 
             CREATE TABLE IF NOT EXISTS orders (
                 id SERIAL PRIMARY KEY,

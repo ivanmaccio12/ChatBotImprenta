@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './index.css';
+import ChatCRM from './components/ChatCRM.jsx';
 
 const API_URL = `http://${window.location.hostname}:3002`; // Use dynamic IP or domain
 
@@ -11,6 +12,7 @@ const COLUMNS = [
 ];
 
 function App() {
+    const [view, setView] = useState('kanban'); // 'kanban' or 'crm'
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAllDelivered, setShowAllDelivered] = useState(false);
@@ -69,92 +71,114 @@ function App() {
     if (loading) return <div className="loading">Cargando tablero...</div>;
 
     return (
-        <div className="kanban-container">
-            <header className="header">
-                <h1>Axis Kanban</h1>
-                <p>Gestión de Pedidos de CopyShow</p>
+        <div className="app-container">
+            <header className="main-header">
+                <div className="logo-area">
+                    <h1>Axis Workspace</h1>
+                    <p>CopyShow Salta</p>
+                </div>
+                <nav className="main-nav">
+                    <button
+                        className={`nav-btn ${view === 'kanban' ? 'active' : ''}`}
+                        onClick={() => setView('kanban')}
+                    >
+                        📋 Tablero Pedidos
+                    </button>
+                    <button
+                        className={`nav-btn ${view === 'crm' ? 'active' : ''}`}
+                        onClick={() => setView('crm')}
+                    >
+                        💬 CRM WhatsApp
+                    </button>
+                </nav>
             </header>
 
-            <div className="board">
-                {COLUMNS.map(col => {
-                    const allColumnOrders = orders.filter(o => (o.status || 'nuevos_pedidos') === col.id);
-                    const isEntregados = col.id === 'entregados';
-                    const columnOrders = (isEntregados && !showAllDelivered)
-                        ? allColumnOrders.slice(0, 10)
-                        : allColumnOrders;
+            {view === 'kanban' ? (
+                <div className="kanban-container">
+                    <div className="board">
+                        {COLUMNS.map(col => {
+                            const allColumnOrders = orders.filter(o => (o.status || 'nuevos_pedidos') === col.id);
+                            const isEntregados = col.id === 'entregados';
+                            const columnOrders = (isEntregados && !showAllDelivered)
+                                ? allColumnOrders.slice(0, 10)
+                                : allColumnOrders;
 
-                    return (
-                        <div key={col.id} className={`column col-${col.id}`}>
-                            <div className="column-header">
-                                <span className="column-title">{col.title}</span>
-                                <span className="column-count">{allColumnOrders.length}</span>
-                            </div>
+                            return (
+                                <div key={col.id} className={`column col-${col.id}`}>
+                                    <div className="column-header">
+                                        <span className="column-title">{col.title}</span>
+                                        <span className="column-count">{allColumnOrders.length}</span>
+                                    </div>
 
-                            <div className="column-content">
-                                {columnOrders.map(order => (
-                                    <div key={order.id} className={`card card-${order.status || 'nuevos_pedidos'}`}>
-                                        <div className="card-title">Pedido #{order.id}</div>
-                                        <div className="card-details">
-                                            <div><strong>Ref MP:</strong> {order.mp_reference}</div>
-                                            <div><strong>Teléfono:</strong> {order.customer_phone}</div>
-                                            <div><strong>Fecha:</strong> {new Date(order.created_at).toLocaleString('es-AR')}</div>
-                                            {order.details && Array.isArray(order.details) && order.details.map((item, i) => (
-                                                <div key={i} style={{ marginTop: '4px' }}>
-                                                    • {item.title || item.name} ({item.quantity}x)
+                                    <div className="column-content">
+                                        {columnOrders.map(order => (
+                                            <div key={order.id} className={`card card-${order.status || 'nuevos_pedidos'}`}>
+                                                <div className="card-title">Pedido #{order.id}</div>
+                                                <div className="card-details">
+                                                    <div><strong>Ref MP:</strong> {order.mp_reference}</div>
+                                                    <div><strong>Teléfono:</strong> {order.customer_phone}</div>
+                                                    <div><strong>Fecha:</strong> {new Date(order.created_at).toLocaleString('es-AR')}</div>
+                                                    {order.details && Array.isArray(order.details) && order.details.map((item, i) => (
+                                                        <div key={i} style={{ marginTop: '4px' }}>
+                                                            • {item.title || item.name} ({item.quantity}x)
+                                                        </div>
+                                                    ))}
                                                 </div>
-                                            ))}
-                                        </div>
 
-                                        <div className="card-footer">
-                                            <div className="card-price">
-                                                ${Number(order.total_price).toLocaleString('es-AR')}
+                                                <div className="card-footer">
+                                                    <div className="card-price">
+                                                        ${Number(order.total_price).toLocaleString('es-AR')}
+                                                    </div>
+                                                    <div className="card-actions">
+                                                        {col.id !== 'nuevos_pedidos' && (
+                                                            <button
+                                                                className="btn-move"
+                                                                onClick={() => moveOrder(order.id, col.id, 'prev')}
+                                                                title="Mover atrás"
+                                                            >
+                                                                ←
+                                                            </button>
+                                                        )}
+                                                        {col.id !== 'entregados' && (
+                                                            <button
+                                                                className="btn-move"
+                                                                onClick={() => moveOrder(order.id, col.id, 'next')}
+                                                                title="Avanzar etapa"
+                                                            >
+                                                                →
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="card-actions">
-                                                {col.id !== 'nuevos_pedidos' && (
-                                                    <button
-                                                        className="btn-move"
-                                                        onClick={() => moveOrder(order.id, col.id, 'prev')}
-                                                        title="Mover atrás"
-                                                    >
-                                                        ←
-                                                    </button>
-                                                )}
-                                                {col.id !== 'entregados' && (
-                                                    <button
-                                                        className="btn-move"
-                                                        onClick={() => moveOrder(order.id, col.id, 'next')}
-                                                        title="Avanzar etapa"
-                                                    >
-                                                        →
-                                                    </button>
-                                                )}
+                                        ))}
+
+                                        {allColumnOrders.length === 0 && (
+                                            <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem 0', fontSize: '0.9rem', fontStyle: 'italic' }}>
+                                                Sin pedidos
                                             </div>
-                                        </div>
-                                    </div>
-                                ))}
+                                        )}
 
-                                {allColumnOrders.length === 0 && (
-                                    <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem 0', fontSize: '0.9rem', fontStyle: 'italic' }}>
-                                        Sin pedidos
+                                        {isEntregados && allColumnOrders.length > 10 && (
+                                            <div style={{ textAlign: 'center', paddingTop: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)', marginTop: '0.5rem' }}>
+                                                <button
+                                                    className="btn-move"
+                                                    style={{ width: '100%', padding: '0.75rem', background: 'rgba(255, 255, 255, 0.05)' }}
+                                                    onClick={() => setShowAllDelivered(!showAllDelivered)}
+                                                >
+                                                    {showAllDelivered ? 'Ocultar históricos' : `Ver todos (${allColumnOrders.length})`}
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-
-                                {isEntregados && allColumnOrders.length > 10 && (
-                                    <div style={{ textAlign: 'center', paddingTop: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)', marginTop: '0.5rem' }}>
-                                        <button
-                                            className="btn-move"
-                                            style={{ width: '100%', padding: '0.75rem', background: 'rgba(255, 255, 255, 0.05)' }}
-                                            onClick={() => setShowAllDelivered(!showAllDelivered)}
-                                        >
-                                            {showAllDelivered ? 'Ocultar históricos' : `Ver todos (${allColumnOrders.length})`}
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            ) : (
+                <ChatCRM />
+            )}
         </div>
     );
 }
