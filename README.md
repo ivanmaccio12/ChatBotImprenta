@@ -3,9 +3,10 @@
 ## 1. Introducción
 Esta documentación describe la versión completa y definitiva de la solución automatizada de atención al cliente y gestión de pedidos, diseñada originariamente para **Gráficas, Imprentas o Librerías**, pero adaptable a modelos de negocios similares (servicios a medida, ventas con cotización, etc.).
 
-La solución consta de dos componentes principales y sincronizados en tiempo real:
+La solución consta de tres componentes principales y sincronizados en tiempo real:
 1. **Asistente Virtual con IA (Bot de WhatsApp y Web)**: Atiende consultas, cotiza productos en base a listas de precios dinámicas y asiste al cliente en la generación de su pedido.
 2. **Panel de Control (Kanban)**: Un sistema web para que los empleados gestionen la producción de los pedidos, los pagos y la asignación de responsables.
+3. **CRM Integrado (Monitoreo e Intervención)**: Una plataforma que permite seguir las conversaciones del bot en vivo e intervenir manualmente cuando el cliente lo requiera.
 
 ---
 
@@ -56,6 +57,10 @@ El sistema consta de columnas que representan los estados del flujo de trabajo d
 ### 3.4. Motor de Búsqueda
 *   El panel superior incluye un potente buscador en tiempo real para localizar rápidamente el estado de trabajo de los clientes.
 *   Permite filtrar y buscar tanto por **Número de Pedido** como por el **Nombre del Cliente** capturado por el bot.
+### 3.5. CRM y Monitoreo de Conversaciones
+*   **Seguimiento en Tiempo Real:** El sistema incluye un CRM donde los empleados pueden visualizar en vivo cada una de las interacciones que el bot tiene con los clientes.
+*   **Intervención Humana (Takeover):** Permite a un agente humano pausar la IA y tomar el control de la conversación en tiempo real directamente desde la plataforma, siendo la solución ideal para responder dudas complejas o requerimientos muy personalizados.
+*   **Diferenciador Clave:** Es una de las características más importantes de la plataforma. Ha demostrado ser una funcionalidad indispensable y altamente demandada por los clientes, ya que brinda la seguridad y control total sobre la Inteligencia Artificial.
 
 ---
 
@@ -69,7 +74,7 @@ La solución es moderna, ligera (no requiere servidores inmensos) y escalable te
 *   **Base de Datos Relacional:** PostgreSQL. Encargado de almacenar la memoria de chats, el catálogo de pedidos y el estado del Kanban. Su estructuración asegura retener conversaciones largas ininterrumpidamente.
 *   **Automatización e Integraciones (N8N):** Actúa como middleware de bajo código para interconectar de forma fácil la API web, planillas dinámicas (para precios y empleados) y las Pasarelas de Pago (Mercado Pago).
 
-### Frontend (Kanban)
+### Frontend (Kanban y CRM)
 *   **Framework React.js con Vite:** Para construir una UI extremadamente fluida y rápida (Single Page Application).
 *   **Estilos y UX:** Componentes construidos a la medida garantizando una estética premium y facilidad de uso táctil y por mouse.
 
@@ -86,3 +91,4 @@ La solución es moderna, ligera (no requiere servidores inmensos) y escalable te
 3.  **Trazabilidad y Organización:** El paso de libretas de papel o mensajes desordenados a un tablero Kanban digital elimina el estrés de "¿qué le tocaba a quién?" y previene pérdidas o demoras en la entrega.
 4.  **Cero Fugas Financieras:** La restricción impuesta en el Kanban de no poder pasar a "Entregado" ningún trabajo pendiente de pago elimina los errores en la ventanilla de atención presencial por olvidos de cobro.
 5.  **Simplicidad de Mantenimiento:** El dueño del negocio no necesita aprender a usar software complejo; actualiza sus precios o su nómina de empleados simplemente escribiendo en celdas de una planilla.
+6.  **Control Total sobre la IA (CRM):** El negocio nunca pierde el control sobre la experiencia del usuario. La capacidad de monitorear e intervenir en tiempo real brinda la confianza y seguridad indispensables que buscan las empresas al adoptar la IA.
