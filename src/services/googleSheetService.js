@@ -119,3 +119,28 @@ export const formatDataForPrompt = (data) => {
     promptPart += "---\n";
     return promptPart;
 };
+
+/**
+ * Parses the Empleados sheet and returns an array of employee names
+ */
+export const getEmployeesList = async () => {
+    try {
+        const data = await getSheetData();
+        const employeesSheet = data['Empleados'];
+        if (!employeesSheet || employeesSheet.length <= 1) {
+            return [];
+        }
+        // Skip header row (index 0), collect names from first column
+        const employees = [];
+        for (let i = 1; i < employeesSheet.length; i++) {
+            const row = employeesSheet[i];
+            if (row && row[0] && String(row[0]).trim()) {
+                employees.push(String(row[0]).trim());
+            }
+        }
+        return employees;
+    } catch (error) {
+        console.error('Error fetching employees list:', error);
+        return [];
+    }
+};

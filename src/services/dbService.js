@@ -37,6 +37,15 @@ export const initDB = async () => {
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                 updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
+
+            -- New columns for Kanban v2
+            ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_status VARCHAR(50) DEFAULT 'pendiente';
+            ALTER TABLE orders ADD COLUMN IF NOT EXISTS assigned_employee VARCHAR(255) DEFAULT NULL;
+            ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_name VARCHAR(255) DEFAULT NULL;
+            ALTER TABLE orders ADD COLUMN IF NOT EXISTS description TEXT DEFAULT NULL;
+            ALTER TABLE orders ADD COLUMN IF NOT EXISTS attachments JSONB DEFAULT '[]';
+            ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_date TIMESTAMPTZ DEFAULT NULL;
+            ALTER TABLE orders ADD COLUMN IF NOT EXISTS order_number SERIAL;
         `);
         console.log('✅ Database initialized: conversations and orders tables ready.');
     } catch (error) {

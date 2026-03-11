@@ -68,6 +68,7 @@ export const chatController = async (req, res) => {
                 if (parsedData.SALE_CLOSED) {
                     saleClosed = true;
                     saleDetails = {
+                        customer_name: parsedData.customer_name || null,
                         items: parsedData.items,
                         total_price: parsedData.total_price
                     };
