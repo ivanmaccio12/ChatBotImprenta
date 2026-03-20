@@ -88,7 +88,7 @@ Si deseas utilizar este código para crear un nuevo sistema desde cero (ej. un b
 2. **Entorno y Secretos (.env):**
    - Elige el nuevo puerto (ej. `3006`).
    - Genera/asigna la API Key del modelo LLM (Anthropic).
-   - Crea un nuevo Excel (Google Sheets), hazlo público (formato export=xlsx) y colócalo en `GOOGLE_SHEET_URL`.
+   - *(Opcional)* Si el bot necesita leer precios o cotizar, crea un nuevo Excel (Google Sheets), hazlo público (formato export=xlsx) y colócalo en `GOOGLE_SHEET_URL`. Para otros tipos de bots (ej. atención general), este paso puede ignorarse.
    - Modifica `DATABASE_URL` para que apunte a un nuevo string (ej. creando la DB `nuevo_bot_db` en el mismo servidor Postgres).
 3. **Configuración de WhatsApp (Cloud API de Meta):**
    - En el portal de Meta for Developers, configura una App usando WhatsApp Business Platform.
@@ -100,3 +100,5 @@ Si deseas utilizar este código para crear un nuevo sistema desde cero (ej. un b
    - Añade a PM2 el proceso: `pm2 start src/index.js --name "NuevoProyectoBot_Backend"`.
 5. **Canalización con N8N:**
    - Crea un workflow nuevo específico en n8n para este bot (para manejar intervenciones de CRM u otras tareas), asocia el webhook público que genere n8n en el `.env` como `N8N_WEBHOOK_URL` y reinicia PM2.
+6. **Registrar la Referencia del Nuevo Proyecto (Documentación):**
+   - Una vez desplegado, replica este mismo documento `DOCUMENTACION_TECNICA.md` adaptando los detalles (rutas, IPs, puertos) específicos del nuevo bot, para mantener un estándar documentado en cada proyecto de tu ecosistema.
